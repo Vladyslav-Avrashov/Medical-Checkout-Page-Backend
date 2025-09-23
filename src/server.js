@@ -7,11 +7,23 @@ import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { getEnvVar } from './utils/getEnvVar.js';
 import { sessionMiddleware } from './middlewares/sessionMiddleware.js';
 import { initCartMiddleware } from './middlewares/initCartMiddleware.js';
+import { ALLOWED_ORIGINS } from './constants/origins.js';
 
 export const setupServer = () => {
   const app = express();
 
-  app.use(cors());
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        if (ALLOWED_ORIGINS.includes(origin) || !origin) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+      credentials: true,
+    }),
+  );
   app.use(express.json());
   app.use(sessionMiddleware);
   app.use(initCartMiddleware);
