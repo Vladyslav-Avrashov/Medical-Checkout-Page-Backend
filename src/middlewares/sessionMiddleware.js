@@ -2,6 +2,8 @@ import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import { getEnvVar } from '../utils/getEnvVar.js';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 export const sessionMiddleware = session({
   secret: getEnvVar('SESSION_SECRET'),
   resave: false,
@@ -20,9 +22,9 @@ export const sessionMiddleware = session({
   }),
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7,
-    secure: false,
-    sameSite: 'lax',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     httpOnly: true,
-    domain: undefined,
+    domain: isProduction ? '.onrender.com' : undefined,
   },
 });
