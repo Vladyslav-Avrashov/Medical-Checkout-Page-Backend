@@ -8,7 +8,7 @@ export const sessionMiddleware = session({
   secret: getEnvVar('SESSION_SECRET'),
   resave: false,
   saveUninitialized: false,
-  name: 'sessionId',
+  name: 'connect.sid',
   store: MongoStore.create({
     mongoUrl: (() => {
       const user = getEnvVar('MONGODB_USER');
@@ -19,6 +19,7 @@ export const sessionMiddleware = session({
     })(),
     collectionName: 'sessions',
     ttl: 7 * 24 * 60 * 60,
+    touchAfter: 24 * 3600,
   }),
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7,
