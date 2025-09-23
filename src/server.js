@@ -7,21 +7,28 @@ import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { getEnvVar } from './utils/getEnvVar.js';
 import { sessionMiddleware } from './middlewares/sessionMiddleware.js';
 import { initCartMiddleware } from './middlewares/initCartMiddleware.js';
-import { ALLOWED_ORIGINS } from './constants/origins.js';
 
 export const setupServer = () => {
   const app = express();
 
+  if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+  }
+
   app.use(
     cors({
-      origin: ['http://localhost:5173', 'https://medical-checkout-page.vercel.app' ],
+      origin: [
+        'http://localhost:5173',
+        'https://medical-checkout-page.vercel.app',
+      ],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-      exposedHeaders: ['Set-Cookie']
+      exposedHeaders: ['Set-Cookie'],
     }),
   );
   app.use(express.json());
+
   app.use(sessionMiddleware);
   app.use(initCartMiddleware);
 
@@ -29,7 +36,10 @@ export const setupServer = () => {
     if (req.method === 'OPTIONS') {
       res.header('Access-Control-Allow-Credentials', 'true');
       res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
+      res.header(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Authorization, Cookie',
+      );
       return res.sendStatus(200);
     }
     next();

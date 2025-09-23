@@ -7,8 +7,9 @@ const isProduction = process.env.NODE_ENV === 'production';
 export const sessionMiddleware = session({
   secret: getEnvVar('SESSION_SECRET'),
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   name: 'connect.sid',
+
   store: MongoStore.create({
     mongoUrl: (() => {
       const user = getEnvVar('MONGODB_USER');
@@ -20,7 +21,9 @@ export const sessionMiddleware = session({
     collectionName: 'sessions',
     ttl: 7 * 24 * 60 * 60,
     touchAfter: 24 * 3600,
+    autoRemove: 'native',
   }),
+
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7,
     secure: isProduction,
@@ -28,4 +31,7 @@ export const sessionMiddleware = session({
     httpOnly: true,
     domain: isProduction ? '.onrender.com' : undefined,
   },
+
+  rolling: true,
+  proxy: isProduction,
 });
