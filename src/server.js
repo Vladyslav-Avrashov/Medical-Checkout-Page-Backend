@@ -14,20 +14,26 @@ export const setupServer = () => {
 
   app.use(
     cors({
-      origin: (origin, callback) => {
-        if (ALLOWED_ORIGINS.includes(origin) || !origin) {
-          callback(null, true);
-        } else {
-          callback(new Error('Not allowed by CORS'));
-        }
-      },
+      origin: ['http://localhost:5173', 'https://medical-checkout-page.vercel.app' ],
       credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+      exposedHeaders: ['Set-Cookie']
     }),
   );
   app.use(express.json());
   app.use(sessionMiddleware);
   app.use(initCartMiddleware);
 
+  app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      res.header('Access-Control-Allow-Credentials', 'true');
+      res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
+      return res.sendStatus(200);
+    }
+    next();
+  });
   app.use('/cart', cartRouter);
   app.use('/orders', ordersRouter);
 
