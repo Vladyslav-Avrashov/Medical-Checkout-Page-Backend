@@ -6,6 +6,7 @@ export const sessionMiddleware = session({
   secret: getEnvVar('SESSION_SECRET'),
   resave: false,
   saveUninitialized: false,
+  name: 'sessionId',
   store: MongoStore.create({
     mongoUrl: (() => {
       const user = getEnvVar('MONGODB_USER');
@@ -15,11 +16,13 @@ export const sessionMiddleware = session({
       return `mongodb+srv://${user}:${password}@${url}/${db}?retryWrites=true&w=majority&appName=Cluster0`;
     })(),
     collectionName: 'sessions',
+    ttl: 7 * 24 * 60 * 60,
   }),
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7,
-    secure: getEnvVar('NODE_ENV') === 'production',
-    sameSite: getEnvVar('NODE_ENV') === 'production' ? 'none' : 'lax',
+    secure: false,
+    sameSite: 'lax',
     httpOnly: true,
+    domain: undefined,
   },
 });
