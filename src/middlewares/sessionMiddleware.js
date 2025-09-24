@@ -29,7 +29,7 @@ export const sessionMiddleware = session({
     secure: isProduction,
     sameSite: isProduction ? 'none' : 'lax',
     httpOnly: true,
-    domain: isProduction ? '.onrender.com' : undefined,
+    domain: undefined,
   },
 
   rolling: true,
